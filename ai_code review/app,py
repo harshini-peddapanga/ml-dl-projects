@@ -1,0 +1,50 @@
+import google.generativeai as genai
+import gradio as gr
+
+genai.configure(api_key="YOUR_API_KEY")
+
+def generate_blog(topic, audience, language, tone, terminology, words):
+    prompt = f"""
+    Write a {words}-word blog.
+
+    Topic: {topic}
+    Audience: {audience}
+    Language: {language}
+    Tone: {tone}
+    Terminology: {terminology}
+
+    Include:
+    - Introduction
+    - Fun Facts
+    - Advantages
+    - Conclusion
+    """
+
+    model = genai.GenerativeModel("gemini-pro")
+    response = model.generate_content(prompt)
+    return response.text
+
+demo = gr.Interface(
+    fn=generate_blog,
+    inputs=[
+        gr.Textbox(label="Topic"),
+        gr.Textbox(label="Audience"),
+        gr.Dropdown(
+            ["Telugu", "Hindi", "English", "Kannada", "Marathi"],
+            label="Language"
+        ),
+        gr.Dropdown(
+            ["Professional", "Casual", "Funny", "Technical", "Inspirational", "Sarcastic"],
+            label="Tone"
+        ),
+        gr.Dropdown(
+            ["Simple", "Moderate", "Complex"],
+            label="Terminology"
+        ),
+        gr.Slider(100, 1200, value=500, label="Word Count")
+    ],
+    outputs="markdown",
+    title="AI Blog Generator (Gemini)"
+)
+
+demo.launch()
